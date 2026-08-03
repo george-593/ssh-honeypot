@@ -22,7 +22,7 @@ type Handler struct {
 func main() {
 	// Setup Logger and Storage
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	storage, err := storage.NewJSONLogger("data/events.log")
+	storage, err := storage.NewSQLiteStorage("data/events.sql")
 	if err != nil {
 		logger.Error("Unable to initialize storage", "error", err)
 	}
