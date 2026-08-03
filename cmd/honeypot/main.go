@@ -12,7 +12,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-const port string = "22229"
+const port string = "22"
 
 type Handler struct {
 	logger  *slog.Logger
