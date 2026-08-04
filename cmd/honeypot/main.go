@@ -34,6 +34,7 @@ func main() {
 	nodeID := os.Getenv("NODE_ID")
 	if nodeID == "" {
 		nodeID, _ = os.Hostname()
+		logger.Warn("Unable to load NODE_ID from env, resorting to hostname", "hostname", nodeID)
 	}
 
 	handler := &Handler{
