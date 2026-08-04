@@ -77,6 +77,18 @@ step too.
 ## Deployment
 
 ```bash
+# Edit /etc/ssh/sshd_config, set:
+Port 62222
+
+# Open the new port in the firewall (adjust for ufw/iptables/whatever's active)
+ufw allow 62222/tcp
+
+# Restart sshd
+systemctl restart ssh
+
+# In a SEPARATE terminal, before closing this one:
+ssh -p 62222 user@vps-ip
+
 # Install Docker
 curl -fsSL https://get.docker.com | sh
 
