@@ -26,6 +26,7 @@ func main() {
 	storage, err := storage.NewSQLiteStorage("data/events.sql")
 	if err != nil {
 		logger.Error("Unable to initialize storage", "error", err)
+		os.Exit(1)
 	}
 	defer storage.Close()
 
@@ -45,11 +46,13 @@ func main() {
 	key, err := os.ReadFile("host_key")
 	if err != nil {
 		logger.Error("Unable to load private key", "error", err)
+		os.Exit(1)
 	}
 
 	signer, err := ssh.ParsePrivateKey(key)
 	if err != nil {
 		logger.Error("Unable to parse private key", "error", err)
+		os.Exit(1)
 	}
 
 	// Setup SSH Server
@@ -62,12 +65,14 @@ func main() {
 	listener, err := net.Listen("tcp", "0.0.0.0:"+port)
 	if err != nil {
 		logger.Error("Unable to create TCP listener", "error", err)
+		os.Exit(1)
 	}
 
 	for {
 		tcpConn, err := listener.Accept()
 		if err != nil {
 			logger.Error("Error accepting incoming connection", "error", err)
+			continue
 		}
 		go handleConn(tcpConn, config)
 	}
