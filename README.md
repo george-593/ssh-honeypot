@@ -73,3 +73,30 @@ Top Client-version Fingerprints:
 
 The honeypot never grants access and never executes attacker input. This is obviously a hard constraint for the planned fake-shell
 step too.
+
+## Deployment
+
+```bash
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+
+# Clone the repo
+git clone https://github.com/george-593/ssh-honeypot /opt/ssh-honeypot
+cd /opt/ssh-honeypot
+
+# Generate the host key
+ssh-keygen -t ed25519 -f host_key -N ""
+
+# Name this node
+echo "NODE_ID=<name-this-node>" > deploy/.env
+
+mkdir -p data
+
+# Build and start
+docker compose -f deploy/docker-compose.yml build
+docker compose -f deploy/docker-compose.yml up -d
+```
+
+### Check Running
+`ssh test@<vps-ip>`
+`docker compose -f deploy/docker-compose.yml logs -f`
