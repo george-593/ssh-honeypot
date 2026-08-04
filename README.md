@@ -105,10 +105,14 @@ echo "NODE_ID=<name-this-node>" > deploy/.env
 mkdir -p data
 
 # Build and start
-docker compose -f deploy/docker-compose.yml build
+docker compose -f deploy/docker-compose.yml build --pull
 docker compose -f deploy/docker-compose.yml up -d
 ```
 
 ### Check Running
 `ssh test@<vps-ip>`
 `docker compose -f deploy/docker-compose.yml logs -f`
+
+### Updating
+`chmod +x deploy/update.sh`
+`./deploy/update.sh`
