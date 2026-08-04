@@ -7,9 +7,10 @@ services:
     container_name: ssh-honeypot
     restart: unless-stopped
 
-    #network_mode: host
-    ports:
-      - "2222:22"
+    # Comment network_mode and uncomment ports for local mac testing
+    network_mode: host
+    #ports:
+    #  - "2222:22"
 
     environment:
       - NODE_ID=${NODE_ID}
