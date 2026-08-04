@@ -1,0 +1,26 @@
+services:
+  honeypot:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: ssh-honeypot:latest
+    container_name: ssh-honeypot
+    restart: unless-stopped
+
+    #network_mode: host
+    ports:
+      - "2222:22"
+
+    environment:
+      - NODE_ID=${NODE_ID}
+
+    volumes:
+      - ../data:/app/data
+      - ../host_key:/app/host_key:ro
+
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    security_opt:
+      - no-new-privileges:true
