@@ -116,3 +116,4 @@ docker compose -f deploy/docker-compose.yml up -d
 ### Updating
 `chmod +x deploy/update.sh`
 `./deploy/update.sh`
+`docker compose -f deploy/docker-compose.yml logs -f`
