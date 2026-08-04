@@ -17,6 +17,7 @@ const port string = "22"
 type Handler struct {
 	logger  *slog.Logger
 	storage storage.Storage
+	nodeID  string
 }
 
 func main() {
@@ -28,9 +29,16 @@ func main() {
 	}
 	defer storage.Close()
 
+	// Load node ID
+	nodeID := os.Getenv("NODE_ID")
+	if nodeID == "" {
+		nodeID, _ = os.Hostname()
+	}
+
 	handler := &Handler{
 		logger:  logger,
 		storage: storage,
+		nodeID:  nodeID,
 	}
 
 	// Load host key
@@ -71,7 +79,7 @@ func (h *Handler) handlePasswordCallback(conn ssh.ConnMetadata, password []byte)
 		h.logger.Error("Error splitting host and port", "error", err)
 	}
 	e := event.Event{
-		NodeID:        "honeypot-1",
+		NodeID:        h.nodeID,
 		Timestamp:     time.Now(),
 		SourceIP:      host,
 		SourcePort:    port,
