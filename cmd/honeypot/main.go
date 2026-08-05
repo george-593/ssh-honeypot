@@ -4,20 +4,24 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"net/netip"
 	"os"
 	"time"
 
 	"github.com/george-593/ssh-honeypot/internal/event"
 	"github.com/george-593/ssh-honeypot/internal/storage"
+	"github.com/oschwald/geoip2-golang/v2"
 	"golang.org/x/crypto/ssh"
 )
 
 const port string = "22"
 
 type Handler struct {
-	logger  *slog.Logger
-	storage storage.Storage
-	nodeID  string
+	logger    *slog.Logger
+	storage   storage.Storage
+	nodeID    string
+	countryDB *geoip2.Reader
+	asnDB     *geoip2.Reader
 }
 
 func main() {
@@ -37,10 +41,27 @@ func main() {
 		logger.Warn("Unable to load NODE_ID from env, resorting to hostname", "hostname", nodeID)
 	}
 
+	// Load Coutry and ASN DB
+	countryDB, err := geoip2.Open("data/GeoLite2-Country.mmdb")
+	if err != nil {
+		logger.Error("Unable to load Country DB", "error", err)
+		os.Exit(1)
+	}
+	defer countryDB.Close()
+
+	asnDB, err := geoip2.Open("data/GeoLite2-ASN.mmdb")
+	if err != nil {
+		logger.Error("Unable to load ASN DB", "error", err)
+		os.Exit(1)
+	}
+	defer asnDB.Close()
+
 	handler := &Handler{
-		logger:  logger,
-		storage: storage,
-		nodeID:  nodeID,
+		logger:    logger,
+		storage:   storage,
+		nodeID:    nodeID,
+		countryDB: countryDB,
+		asnDB:     asnDB,
 	}
 
 	// Load host key
@@ -84,6 +105,39 @@ func (h *Handler) handlePasswordCallback(conn ssh.ConnMetadata, password []byte)
 	if err != nil {
 		h.logger.Error("Error splitting host and port", "error", err)
 	}
+
+	// Get the ASN and Country
+	var country, asn string
+	// Parse net addr for geoip2 to use
+	hostAddr, err := netip.ParseAddr(host)
+	if err != nil {
+		h.logger.Error("Unable to parse net addr from host", "host", host, "error", err)
+		country = "Unknown"
+		asn = "Unknown"
+	} else {
+		record, err := h.countryDB.Country(hostAddr)
+		if err != nil {
+			h.logger.Error("Unable to parse country from IP", "host", host, "error", err)
+		}
+
+		if record.HasData() {
+			country = record.Country.Names.English
+		} else {
+			country = "Unknown"
+		}
+
+		asnRecord, err := h.asnDB.ASN(hostAddr)
+		if err != nil {
+			h.logger.Error("Unable to parse ASN from IP", "host", host, "error", err)
+		}
+
+		if asnRecord.HasData() {
+			asn = asnRecord.AutonomousSystemOrganization
+		} else {
+			asn = "Unknown"
+		}
+	}
+
 	e := event.Event{
 		NodeID:        h.nodeID,
 		Timestamp:     time.Now(),
@@ -93,8 +147,8 @@ func (h *Handler) handlePasswordCallback(conn ssh.ConnMetadata, password []byte)
 		Password:      string(password),
 		ClientVersion: string(conn.ClientVersion()),
 		SessionID:     fmt.Sprintf("%x", conn.SessionID()),
-		Country:       "Unknown", // TODO: Implement GeoIP lookup
-		ASN:           "Unknown", // TODO: Implement ASN lookup
+		Country:       country,
+		ASN:           asn,
 	}
 	h.storage.Store(e)
 	return nil, fmt.Errorf("Rejected")
