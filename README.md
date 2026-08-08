@@ -102,11 +102,18 @@ ssh-keygen -t ed25519 -f host_key -N ""
 # Name this node
 echo "NODE_ID=<name-this-node>" > deploy/.env
 
+# Add MaxMind credentials for GeoIP updates
+echo "GEOIPUPDATE_ACCOUNT_ID=<your-maxmind-account-id>" >> deploy/.env
+echo "GEOIPUPDATE_LICENSE_KEY=<your-maxmind-license-key>" >> deploy/.env
+
 mkdir -p data
 
 # Build and start
 docker compose -f deploy/docker-compose.yml build --pull
 docker compose -f deploy/docker-compose.yml up -d
+
+# Add a cronjob to restart the honeypot weekly to receive GeoIP updates
+(crontab -l 2>/dev/null; echo "0 4 * * 1 docker compose -f /opt/ssh-honeypot/deploy/docker-compose.yml restart honeypot") | crontab -
 ```
 
 ### Check Running

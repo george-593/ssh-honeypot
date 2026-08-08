@@ -8,9 +8,9 @@ services:
     restart: unless-stopped
 
     # Comment network_mode and uncomment ports for local mac testing
-    network_mode: host
-    #ports:
-    #  - "2222:22"
+    #network_mode: host
+    ports:
+      - "2222:22"
 
     environment:
       - NODE_ID=${NODE_ID}
@@ -25,3 +25,14 @@ services:
       - NET_BIND_SERVICE
     security_opt:
       - no-new-privileges:true
+  geoipupdate:
+    image: ghcr.io/maxmind/geoipupdate
+    container_name: geoip-update
+    restart: unless-stopped
+    environment:
+      - GEOIPUPDATE_ACCOUNT_ID=${GEOIPUPDATE_ACCOUNT_ID}
+      - GEOIPUPDATE_LICENSE_KEY=${GEOIPUPDATE_LICENSE_KEY}
+      - GEOIPUPDATE_EDITION_IDS=GeoLite2-ASN GeoLite2-Country
+      - GEOIPUPDATE_FREQUENCY=168
+    volumes:
+      - ../data:/usr/share/GeoIP
