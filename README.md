@@ -4,8 +4,8 @@ A SSH honeypot written in Go. It impersonates an SSH server, logs every
 authentication attempt (source IP, username, password, client version), **always rejects
 the login**, and never executes anything the connecting client sends. 
 
-It has been deployed on a VPS since May 2026, where it has logged **382,921 real login attempts** from **962 unique
-source IPs** over 71 days.
+It has been deployed on a VPS since May 2026, where it has logged 382,921 real login attempts from 962 unique
+source IPs over 71 days.
 
 ## How it works
 
@@ -23,10 +23,10 @@ event without the connection-handling code caring which one it's talking to.
 
 | Part | Status |
 |---|---|
-| SSH server, always-reject auth | Done, deployed |
-| Structured logging + JSON store | Done, deployed |
-| SQLite persistence | In progress |
-| GeoIP enrichment (country / ASN) | Not started |
+| SSH server, always-reject auth | Done |
+| Structured logging + JSON store | Done |
+| SQLite persistence | Done |
+| GeoIP enrichment (country / ASN) | In Progress |
 | Medium-interaction fake shell (log commands, canned responses only) | Not started |
 | Multi-node collectors > central Postgres aggregator > Grafana | Potential Future Addition |
 
