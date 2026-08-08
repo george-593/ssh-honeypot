@@ -8,9 +8,9 @@ services:
     restart: unless-stopped
 
     # Comment network_mode and uncomment ports for local mac testing
-    #network_mode: host
-    ports:
-      - "2222:22"
+    network_mode: host
+    #ports:
+    #  - "2222:22"
 
     environment:
       - NODE_ID=${NODE_ID}
