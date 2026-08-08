@@ -26,11 +26,11 @@ event without the connection-handling code caring which one it's talking to.
 | SSH server, always-reject auth | Done |
 | Structured logging + JSON store | Done |
 | SQLite persistence | Done |
-| GeoIP enrichment (country / ASN) | In Progress |
+| GeoIP enrichment (country / ASN) | Done |
 | Medium-interaction fake shell (log commands, canned responses only) | Not started |
 | Multi-node collectors > central Postgres aggregator > Grafana | Potential Future Addition |
 
-## Findings from 383k real login attempts
+## Findings from 383k login attempts
 
 Median attempts/day: 4,247
 Average attempts/day: 5,393
