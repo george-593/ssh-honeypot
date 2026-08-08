@@ -150,7 +150,12 @@ func (h *Handler) handlePasswordCallback(conn ssh.ConnMetadata, password []byte)
 		Country:       country,
 		ASN:           asn,
 	}
-	h.storage.Store(e)
+	err = h.storage.Store(e)
+
+	if err != nil {
+		h.logger.Error("Unable to store event", "error", err)
+	}
+
 	return nil, fmt.Errorf("Rejected")
 }
 
